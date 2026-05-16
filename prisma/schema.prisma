@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  customer
+  provider
+}
+
+// ─── Core Tables ──────────────────────────────────────────────────────────────
+
+model User {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+
+model SeedHistory {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  name       String   @unique
+  executedAt DateTime @default(now())
+
+  @@map("seed_history")
+}

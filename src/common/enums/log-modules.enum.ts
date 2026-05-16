@@ -1,0 +1,9 @@
+export enum LogModuleTypes {
+    AUTH = 'AUTH',
+    USERS = 'USERS',
+    PROVIDERS = 'PROVIDERS',
+    BOOKINGS = 'BOOKINGS',
+    AGENTS = 'AGENTS',
+    NOTIFICATIONS = 'NOTIFICATIONS',
+    SCHEDULING = 'SCHEDULING',
+}
