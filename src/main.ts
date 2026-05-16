@@ -1,7 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { patchNestJsSwagger } from 'nestjs-zod';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common';
 
@@ -10,7 +9,6 @@ async function bootstrap(): Promise<void> {
     const config = app.get(ConfigService);
 
     app.setGlobalPrefix('api/v1');
-    patchNestJsSwagger();
 
     if (process.env.NODE_ENV !== 'production') {
         const conf = new DocumentBuilder()

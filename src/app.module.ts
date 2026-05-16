@@ -1,9 +1,8 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WinstonModule } from 'nest-winston';
-import { ZodValidationPipe } from 'nestjs-zod';
 import configuration from '../config';
 import { dataSourceOptions } from '../database/data-source';
 import { CustomResponseMiddleware, winstonLogger } from './common';
@@ -13,7 +12,10 @@ import { AuthenticationModule, UsersModule } from './modules';
     providers: [
         {
             provide: APP_PIPE,
-            useClass: ZodValidationPipe,
+            useValue: new ValidationPipe({
+                whitelist: true,
+                transform: true,
+            }),
         },
     ],
     imports: [
