@@ -101,19 +101,19 @@ This project uses TypeORM for database interactions. All migrations are stored i
 
 ```bash
 # Generate a new migration from entity changes (auto-detect schema diff)
-DB_HOST=localhost npm run migrate:generate -- database/migrations/MigrationName
+PG_HOST=localhost npm run migrate:generate -- database/migrations/MigrationName
 
 # Create empty migration for seeding
-DB_HOST=localhost npm run migrate:create -- database/migrations/EmptyMigrationName
+PG_HOST=localhost npm run migrate:create -- database/migrations/EmptyMigrationName
 
 # Run all pending migrations
-DB_HOST=localhost npm run migrate:run
+PG_HOST=localhost npm run migrate:run
 
 # Revert the last executed migration
-DB_HOST=localhost npm run migrate:revert
+PG_HOST=localhost npm run migrate:revert
 
 # Drop all tables (CAUTION: destroys all data)
-DB_HOST=localhost npm run schema:drop
+PG_HOST=localhost npm run schema:drop
 ```
 
 ---
