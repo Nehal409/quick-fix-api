@@ -2,17 +2,16 @@ import { unauthorized } from '@hapi/boom';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { User } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { messages } from 'src/common/constants';
-import { PrismaService } from 'src/prisma';
+import { UsersRepository } from '../../users/repositories';
 import { JwtPayload, ValidatedUser } from '../interfaces';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
         configService: ConfigService,
-        private readonly prisma: PrismaService,
+        private readonly usersRepository: UsersRepository,
     ) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -22,9 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: JwtPayload): Promise<ValidatedUser> {
-        const user: User | null = await this.prisma.user.findUnique({
-            where: { id: payload.userId },
-        });
+        const user = await this.usersRepository.findById(payload.userId);
 
         if (!user) {
             throw unauthorized(messages.USER.NOT_FOUND);

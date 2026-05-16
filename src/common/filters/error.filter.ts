@@ -1,8 +1,8 @@
 import * as boom from '@hapi/boom';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { Prisma } from '@prisma/client';
 import { ZodValidationException } from 'nestjs-zod';
+import { QueryFailedError } from 'typeorm';
 import { ErrorResponse } from './error-response.interface';
 
 @Catch()
@@ -25,8 +25,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
             }
         } else if (boom.isBoom(exception)) {
             this.handleBoomError(exception, response);
-        } else if (exception instanceof Prisma.PrismaClientValidationError) {
-            this.handlePrismaError(exception, response);
+        } else if (exception instanceof QueryFailedError) {
+            this.handleDatabaseError(exception, response);
         } else {
             this.handleDefaultError(exception, response);
         }
@@ -45,7 +45,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         response.status(status).json(responseBody);
     }
 
-    private handlePrismaError(exception: Prisma.PrismaClientValidationError, response: any): void {
+    private handleDatabaseError(exception: QueryFailedError, response: any): void {
         const status = HttpStatus.INTERNAL_SERVER_ERROR;
         const responseBody =
             process.env.NODE_ENV === 'development'

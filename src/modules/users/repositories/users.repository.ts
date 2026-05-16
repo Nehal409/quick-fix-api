@@ -1,23 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { PrismaService } from 'src/prisma';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UpdateUserDto } from '../dto';
-import { UserProfileResponse } from '../interfaces';
+import { User } from '../entities';
+import { UserProfileResponse, CreateUserData } from '../interfaces';
 
 @Injectable()
 export class UsersRepository {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        @InjectRepository(User)
+        private readonly usersRepository: Repository<User>,
+    ) {}
 
     async findById(id: number): Promise<User | null> {
-        return this.prisma.user.findUnique({ where: { id } });
+        return this.usersRepository.findOne({ where: { id } });
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        return this.prisma.user.findUnique({ where: { email } });
+        return this.usersRepository.findOne({ where: { email } });
+    }
+
+    async findByEmailWithPassword(email: string): Promise<User | null> {
+        return this.usersRepository
+            .createQueryBuilder('user')
+            .addSelect('user.passwordHash')
+            .where('user.email = :email', { email })
+            .getOne();
+    }
+
+    async create(data: CreateUserData): Promise<User> {
+        return this.usersRepository.save(
+            this.usersRepository.create({
+                email: data.email,
+                passwordHash: data.passwordHash,
+                name: data.name,
+                role: data.role,
+            }),
+        );
     }
 
     async getProfile(id: number): Promise<UserProfileResponse | null> {
-        return this.prisma.user.findUnique({
+        return this.usersRepository.findOne({
             where: { id },
             select: {
                 uuid: true,
@@ -30,6 +53,7 @@ export class UsersRepository {
     }
 
     async update(id: number, data: UpdateUserDto): Promise<User> {
-        return this.prisma.user.update({ where: { id }, data });
+        await this.usersRepository.update(id, data);
+        return this.usersRepository.findOneOrFail({ where: { id } });
     }
 }

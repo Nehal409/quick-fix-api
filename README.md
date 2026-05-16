@@ -22,7 +22,7 @@ Key differentiators:
 |---|---|
 | Framework | NestJS + TypeScript |
 | Database | PostgreSQL 16 |
-| ORM | Prisma |
+| ORM | TypeORM |
 | LLM | Google Gemini (Flash on hot path, Pro off hot path) |
 | Maps | Google Maps — Distance Matrix + Static Maps |
 | Auth | JWT (email + password, HS256) |
@@ -54,7 +54,11 @@ Required variables:
 
 | Variable | Description |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
+| `PG_HOST` | PostgreSQL host |
+| `PG_PORT` | PostgreSQL port |
+| `PG_USER` | PostgreSQL user |
+| `PG_PASSWORD` | PostgreSQL password |
+| `PG_DATABASE` | PostgreSQL database name |
 | `JWT_SECRET` | Secret for signing JWTs (change in production) |
 | `GEMINI_API_KEY` | Google Gemini API key |
 | `GOOGLE_MAPS_API_KEY` | Google Maps API key |
@@ -69,7 +73,7 @@ Required variables:
 docker compose up --build
 ```
 
-This starts PostgreSQL + the API. Runs migrations and seed on startup.
+This starts PostgreSQL + the API. Runs migrations on startup.
 
 ### Local Development
 
@@ -78,10 +82,7 @@ This starts PostgreSQL + the API. Runs migrations and seed on startup.
 docker compose up db -d
 
 # Run migrations
-npm run migrate:create
-
-# Seed database
-npm run seed
+npm run migrate:run
 
 # Start in watch mode
 npm run start:dev
@@ -92,20 +93,27 @@ Swagger docs at `http://localhost:3000/api/v1/docs`
 
 ---
 
-## Prisma
+## TypeORM and Migrations
+
+This project uses TypeORM for database interactions. All migrations are stored in `database/migrations`.
+
+### Migration Commands
 
 ```bash
-# Generate Prisma client
-npm run prisma:generate
+# Generate a new migration from entity changes (auto-detect schema diff)
+DB_HOST=localhost npm run migrate:generate -- database/migrations/MigrationName
 
-# Create a new migration
-npm run migrate:create
+# Create empty migration for seeding
+DB_HOST=localhost npm run migrate:create -- database/migrations/EmptyMigrationName
 
-# Deploy migrations (production)
-npm run migrate:deploy
+# Run all pending migrations
+DB_HOST=localhost npm run migrate:run
 
-# Seed the database
-npm run seed
+# Revert the last executed migration
+DB_HOST=localhost npm run migrate:revert
+
+# Drop all tables (CAUTION: destroys all data)
+DB_HOST=localhost npm run schema:drop
 ```
 
 ---
