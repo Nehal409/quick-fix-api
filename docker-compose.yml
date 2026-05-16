@@ -16,7 +16,6 @@ services:
     volumes:
       - ./config/:/app/config
       - ./src:/app/src
-      - ./prisma:/app/prisma
     networks:
       - quickfix-network
 

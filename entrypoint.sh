@@ -6,12 +6,7 @@ until pg_isready -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER"; do
   sleep 2
 done
 
-echo "PostgreSQL is up - continuing..."
-
-echo "Running migrations..."
-npm run migrate:deploy
-
-echo "Seeding database..."
-npm run seed
+echo "PostgreSQL is up - running migrations..."
+npm run migrate:run
 
 exec "$@"

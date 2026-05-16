@@ -1,16 +1,12 @@
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
-RUN apk add --no-cache postgresql-client
-
-RUN npm ci
+RUN npm install
 
 COPY . .
-
-RUN npm run prisma:generate
 
 RUN npm run build
 
