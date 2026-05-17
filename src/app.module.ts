@@ -6,7 +6,7 @@ import { WinstonModule } from 'nest-winston';
 import configuration from '../config';
 import { dataSourceOptions } from '../database/data-source';
 import { CustomResponseMiddleware, winstonLogger } from './common';
-import { AuthenticationModule, UsersModule } from './modules';
+import { AuthenticationModule, ProvidersModule, UsersModule } from './modules';
 
 @Module({
     providers: [
@@ -31,6 +31,7 @@ import { AuthenticationModule, UsersModule } from './modules';
         }),
         AuthenticationModule,
         UsersModule,
+        ProvidersModule,
     ],
 })
 export class AppModule {

@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { messages } from 'src/common/constants';
+import { Roles } from 'src/common/enums';
+import { ProvidersService } from '../providers/providers.service';
 import { User } from '../users/entities';
 import { UsersRepository } from '../users/repositories';
 import { LoginDto, RegisterDto } from './dto';
@@ -13,6 +15,7 @@ export class AuthService {
     constructor(
         private readonly usersRepository: UsersRepository,
         private readonly jwtService: JwtService,
+        private readonly providersService: ProvidersService,
     ) {}
 
     async register(dto: RegisterDto): Promise<AuthResponse> {
@@ -24,6 +27,15 @@ export class AuthService {
         const passwordHash = await bcrypt.hash(dto.password, 12);
 
         const user = await this.usersRepository.create({ ...dto, passwordHash });
+
+        // Auto-create a provider profile when registering as a provider
+        if (user.role === Roles.PROVIDER) {
+            await this.providersService.createForUser({
+                userId: user.id,
+                name: user.name,
+                location: user.location,
+            });
+        }
 
         return this.buildAuthResponse(user);
     }
