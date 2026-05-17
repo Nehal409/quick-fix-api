@@ -5,6 +5,7 @@ export interface UserProfileResponse {
     email: string;
     name: string;
     role: Roles;
+    location: string | null;
     createdAt: Date;
 }
 
@@ -13,4 +14,5 @@ export interface CreateUserData {
     passwordHash: string;
     name: string;
     role: Roles;
+    location?: string;
 }

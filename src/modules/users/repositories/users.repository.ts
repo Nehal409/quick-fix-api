@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from '../dto';
 import { User } from '../entities';
-import { UserProfileResponse, CreateUserData } from '../interfaces';
+import { CreateUserData, UserProfileResponse } from '../interfaces';
 
 @Injectable()
 export class UsersRepository {
@@ -35,6 +35,7 @@ export class UsersRepository {
                 passwordHash: data.passwordHash,
                 name: data.name,
                 role: data.role,
+                location: data.location ?? null,
             }),
         );
     }
@@ -47,13 +48,24 @@ export class UsersRepository {
                 email: true,
                 name: true,
                 role: true,
+                location: true,
                 createdAt: true,
             },
         });
     }
 
-    async update(id: number, data: UpdateUserDto): Promise<User> {
-        await this.usersRepository.update(id, data);
-        return this.usersRepository.findOneOrFail({ where: { id } });
+    async update(id: number, dto: UpdateUserDto): Promise<UserProfileResponse> {
+        await this.usersRepository.update(id, dto);
+        return this.usersRepository.findOneOrFail({
+            where: { id },
+            select: {
+                uuid: true,
+                email: true,
+                name: true,
+                role: true,
+                location: true,
+                createdAt: true,
+            },
+        });
     }
 }

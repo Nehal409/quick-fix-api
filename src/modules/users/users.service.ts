@@ -1,4 +1,4 @@
-import { badRequest } from '@hapi/boom';
+import { notFound } from '@hapi/boom';
 import { Injectable } from '@nestjs/common';
 import { messages } from 'src/common/constants';
 import { UpdateUserDto } from './dto';
@@ -12,13 +12,13 @@ export class UsersService {
     async getProfile(userId: number): Promise<UserProfileResponse> {
         const user = await this.usersRepository.getProfile(userId);
         if (!user) {
-            throw badRequest(messages.USER.NOT_FOUND);
+            throw notFound(messages.USER.NOT_FOUND);
         }
         return user;
     }
 
-    async update(userId: number, dto: UpdateUserDto): Promise<void> {
+    async update(userId: number, dto: UpdateUserDto): Promise<UserProfileResponse> {
         await this.getProfile(userId);
-        await this.usersRepository.update(userId, dto);
+        return this.usersRepository.update(userId, dto);
     }
 }
