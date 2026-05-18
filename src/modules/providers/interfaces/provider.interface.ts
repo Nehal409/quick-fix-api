@@ -31,16 +31,16 @@ export interface ProviderSummary {
 
 export interface CreateSlotData {
     providerId: number;
-    date: string;       // 'YYYY-MM-DD'
-    startTime: string;  // 'HH:MM'
-    endTime: string;    // 'HH:MM'
+    date: string; // 'YYYY-MM-DD'
+    startTime: string; // 'HH:MM'
+    endTime: string; // 'HH:MM'
 }
 
 /** Used to query slots that overlap a requested time window. */
 export interface SlotWindow {
-    date: string;       // 'YYYY-MM-DD'
-    startTime: string;  // 'HH:MM'
-    endTime: string;    // 'HH:MM'
+    date: string; // 'YYYY-MM-DD'
+    startTime: string; // 'HH:MM'
+    endTime: string; // 'HH:MM'
 }
 
 export interface SlotSummary {

@@ -43,9 +43,7 @@ export class ProvidersSeeder {
         const existingCount = await this.providersRepo.count();
 
         if (existingCount >= PROVIDER_SEED_DATA.length) {
-            this.logger.log(
-                `Providers already seeded (${existingCount} records). Skipping.`,
-            );
+            this.logger.log(`Providers already seeded (${existingCount} records). Skipping.`);
             return;
         }
 
@@ -98,9 +96,7 @@ export class ProvidersSeeder {
             created++;
         }
 
-        this.logger.log(
-            `Providers seeded successfully. Created: ${created} new records.`,
-        );
+        this.logger.log(`Providers seeded successfully. Created: ${created} new records.`);
     }
 
     /**
@@ -108,10 +104,7 @@ export class ProvidersSeeder {
      * Providers with higher onTimePercent get more slots (more capacity).
      * Uses SLOT_WINDOWS to create realistic morning/afternoon distribution.
      */
-    private async seedAvailability(
-        providerId: number,
-        onTimePercent: number,
-    ): Promise<void> {
+    private async seedAvailability(providerId: number, onTimePercent: number): Promise<void> {
         const slots: CreateSlotData[] = [];
 
         // High-performing providers (onTime ≥ 0.90) offer 3-4 slots/day
