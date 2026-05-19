@@ -6,7 +6,7 @@ import { Roles as RequireRole } from '../authentication/decorators/roles.decorat
 import { JwtAuthGuard, RoleGuard } from '../authentication/guards';
 import { AuthenticatedRequest } from '../authentication/interfaces';
 import { ClarifyRequestDto, CreateRequestDto } from './dto';
-import { ReasoningResponse, RequestResponse } from './interfaces';
+import { ChatResponse, ReasoningResponse, RequestResponse } from './interfaces';
 import { RequestsService } from './requests.service';
 
 @ApiBearerAuth()
@@ -46,6 +46,16 @@ export class RequestsController {
         @Param('providerUuid', ParseUUIDPipe) providerUuid: string,
     ): Promise<{ message: string; data: ReasoningResponse }> {
         const data = await this.requestsService.getReasoning(req.user.userId, uuid, providerUuid);
+        return { message: messages.DATA_FETCHED_SUCCESS, data };
+    }
+
+    @ApiOperation({ description: descriptions.CHAT.REQUEST_CHAT })
+    @Get(':uuid/chat')
+    async getChat(
+        @Req() req: AuthenticatedRequest,
+        @Param('uuid', ParseUUIDPipe) uuid: string,
+    ): Promise<{ message: string; data: ChatResponse }> {
+        const data = await this.requestsService.getChat(req.user.userId, uuid);
         return { message: messages.DATA_FETCHED_SUCCESS, data };
     }
 }

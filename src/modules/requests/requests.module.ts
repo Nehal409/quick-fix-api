@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AgentsModule } from '../agents';
 import { AuthenticationModule } from '../authentication';
+import { NotificationsModule } from '../notifications';
 import { ProvidersModule } from '../providers';
 import { ServiceRequest } from './entities';
 import { RequestsRepository } from './repositories';
@@ -13,6 +14,7 @@ import { RequestsService } from './requests.service';
         TypeOrmModule.forFeature([ServiceRequest]),
         AgentsModule,
         AuthenticationModule,
+        NotificationsModule,
         ProvidersModule,
     ],
     controllers: [RequestsController],

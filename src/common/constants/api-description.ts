@@ -23,4 +23,12 @@ export const descriptions = {
             'Provider transitions the booking through en_route → in_progress → completed.',
         CANCEL: 'Cancel a booking. When the Reschedule Agent is wired, provider-side cancellations will also trigger auto-reschedule.',
     },
+    NOTIFICATION: {
+        LIST: 'Inbox for the current user. Returns notifications grouped by recency (now / today / earlier) with an unread count.',
+        MARK_READ: 'Mark one notification as read.',
+    },
+    CHAT: {
+        REQUEST_CHAT:
+            'Reconstruct the chronological chat turns for a service request — user messages, agent clarifications, user answers, and the final structured intent.',
+    },
 };

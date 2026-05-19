@@ -3,6 +3,7 @@ export * from './authentication';
 export * from './bookings';
 export * from './gemini';
 export * from './matching';
+export * from './notifications';
 export * from './pricing';
 export * from './providers';
 export * from './requests';

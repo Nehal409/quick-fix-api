@@ -45,4 +45,8 @@ export const messages = {
         EMPTY_RESPONSE: 'AI returned an empty response',
         TIMEOUT: 'AI request timed out',
     },
+    NOTIFICATION: {
+        NOT_FOUND: 'Notification not found',
+        MARKED_READ: 'Notification marked as read',
+    },
 };

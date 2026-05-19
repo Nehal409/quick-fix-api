@@ -17,12 +17,20 @@ import {
     RankingAgentResult,
     RankingAgentService,
 } from '../agents';
+import { NotificationsService, NotificationTone, NotificationType } from '../notifications';
 import { MarketSignal } from '../pricing';
 import { Provider, ProvidersRepository } from '../providers';
 import { ClarifyRequestDto, CreateRequestDto } from './dto';
 import { PersistedRankedCandidate, ServiceRequest } from './entities';
 import { RequestStatus } from './enums';
-import { CandidateResponse, IntentSummary, ReasoningResponse, RequestResponse } from './interfaces';
+import {
+    CandidateResponse,
+    ChatResponse,
+    ChatTurn,
+    IntentSummary,
+    ReasoningResponse,
+    RequestResponse,
+} from './interfaces';
 import { RequestsRepository } from './repositories';
 
 @Injectable()
@@ -37,6 +45,7 @@ export class RequestsService {
         private readonly rankingAgent: RankingAgentService,
         private readonly pricingAgent: PricingAgentService,
         private readonly orchestrator: AgentOrchestratorService,
+        private readonly notifications: NotificationsService,
     ) {}
 
     async create(userId: number, dto: CreateRequestDto): Promise<RequestResponse> {
@@ -161,6 +170,7 @@ export class RequestsService {
                 pricing,
                 persistExtra,
             );
+            await this.notifyQuoteReady(updated, pricing);
             return this.buildReadyResponse(
                 updated,
                 intent,
@@ -235,16 +245,104 @@ export class RequestsService {
         pricing: PricingAgentResult,
         extra: Partial<ServiceRequest>,
     ): Promise<ServiceRequest> {
+        // NOTE: `clarifications` is intentionally not wiped — keeping it lets the
+        // chat reconstruction endpoint show the full back-and-forth even after the
+        // request resolves to READY. The `status` field is the source of truth for
+        // whether the UI should still surface clarification UI.
         return this.repository.update(requestId, {
             status: RequestStatus.READY,
             parsedIntent: result.intent,
-            clarifications: [],
             confidence: result.intent.confidence,
             rankedCandidates: ranking.candidates.map(toPersistedCandidate),
             rankingSummary: ranking.summary,
             pricingQuote: pricing.quote,
             ...extra,
         });
+    }
+
+    private async notifyQuoteReady(
+        request: ServiceRequest,
+        pricing: PricingAgentResult,
+    ): Promise<void> {
+        try {
+            const total = pricing.quote.estimateTotal.toLocaleString('en-PK');
+            const withinBudget = pricing.quote.withinBudget
+                ? 'under your budget'
+                : 'over your budget';
+            await this.notifications.create({
+                userId: request.userId,
+                type: NotificationType.PRICE,
+                tone: NotificationTone.NEUTRAL,
+                icon: 'wallet',
+                title: 'Quote ready',
+                body: `Rs. ${total} — ${withinBudget}. Tap to review the breakdown.`,
+                cta: { label: 'Review quote', target: `/requests/${request.uuid}` },
+                requestId: request.id,
+            });
+        } catch (err) {
+            this.logger.warn({
+                message: 'Failed to enqueue quote-ready notification',
+                data: { requestId: request.uuid, err: String(err) },
+            });
+        }
+    }
+
+    async getChat(userId: number, uuid: string): Promise<ChatResponse> {
+        const request = await this.repository.findByUuidForUser(uuid, userId);
+        if (!request) throw notFound(messages.REQUEST.NOT_FOUND);
+        return {
+            requestId: request.uuid,
+            status: request.status,
+            turns: this.reconstructChat(request),
+        };
+    }
+
+    private reconstructChat(request: ServiceRequest): ChatTurn[] {
+        const turns: ChatTurn[] = [];
+        const createdAt = request.createdAt.toISOString();
+        const updatedAt = request.updatedAt.toISOString();
+
+        turns.push({
+            order: 0,
+            role: 'user',
+            kind: 'message',
+            text: request.rawInput,
+            at: createdAt,
+        });
+
+        const clarifications = request.clarifications ?? [];
+        if (clarifications.length > 0) {
+            turns.push({
+                order: 1,
+                role: 'agent',
+                kind: 'clarifications',
+                questions: clarifications,
+                at: createdAt,
+            });
+        }
+
+        const answers = request.clarificationAnswers ?? null;
+        if (answers && Object.keys(answers).length > 0) {
+            turns.push({
+                order: 2,
+                role: 'user',
+                kind: 'answers',
+                answers,
+                at: updatedAt,
+            });
+        }
+
+        if (request.status === RequestStatus.READY && request.parsedIntent) {
+            turns.push({
+                order: turns.length,
+                role: 'agent',
+                kind: 'intent_ready',
+                intent: request.parsedIntent,
+                at: updatedAt,
+            });
+        }
+
+        return turns;
     }
 
     private buildReadyResponse(

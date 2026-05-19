@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { LogModuleTypes, messages } from 'src/common';
 import { AgentOrchestratorService, BookingAgentService } from '../agents';
 import { estimateSectorDistance } from '../matching/factors/sector-distance';
+import { NotificationsService, NotificationTone, NotificationType } from '../notifications';
 import { ProvidersRepository } from '../providers';
 import { RequestStatus } from '../requests/enums';
 import { RequestsRepository } from '../requests/repositories';
@@ -56,6 +57,7 @@ export class BookingsService {
         private readonly usersRepository: UsersRepository,
         private readonly bookingAgent: BookingAgentService,
         private readonly orchestrator: AgentOrchestratorService,
+        private readonly notifications: NotificationsService,
     ) {}
 
     async create(customerId: number, dto: CreateBookingDto): Promise<CreateBookingResponse> {
@@ -115,6 +117,8 @@ export class BookingsService {
             statusTimeline: agent.draft.statusTimeline,
             traceId: context.traceId,
         });
+
+        await this.notifyBookingConfirmed(booking, agent.draft.simulatedWhatsapp.body);
 
         return {
             booking: this.toView(booking),
@@ -180,6 +184,7 @@ export class BookingsService {
             status: dto.status,
             statusTimeline: timeline,
         });
+        await this.notifyStatusChange(updated);
         return { booking: this.toView(updated) };
     }
 
@@ -212,10 +217,125 @@ export class BookingsService {
             data: { bookingCode: booking.bookingCode, reason: dto.reason },
         });
 
+        await this.notifyCancelled(updated, dto);
+
         return {
             originalBooking: this.toView(updated),
             rescheduleAttempted: false,
         };
+    }
+
+    private async notifyBookingConfirmed(booking: Booking, whatsappBody: string): Promise<void> {
+        try {
+            await this.notifications.create({
+                userId: booking.customerId,
+                type: NotificationType.BOOKING,
+                tone: NotificationTone.SUCCESS,
+                icon: 'check',
+                title: 'Booking confirmed',
+                body: `${booking.providerSnapshot.displayName} · ${booking.scheduledAt.toLocaleString('en-PK', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true })}`,
+                cta: { label: 'Track booking', target: `/bookings/${booking.uuid}` },
+                bookingId: booking.id,
+                requestId: booking.requestId,
+            });
+            // Persist the simulated WhatsApp as its own notification row so the
+            // "Simulated WhatsApp" card on the inbox survives past the create response.
+            await this.notifications.create({
+                userId: booking.customerId,
+                type: NotificationType.WA,
+                tone: NotificationTone.SUCCESS,
+                icon: 'chat',
+                title: 'Confirmation sent · simulated WhatsApp',
+                body: whatsappBody,
+                bookingId: booking.id,
+            });
+        } catch (err) {
+            this.logger.warn({
+                message: 'Failed to enqueue confirmation notification',
+                data: { bookingCode: booking.bookingCode, err: String(err) },
+            });
+        }
+    }
+
+    private async notifyStatusChange(booking: Booking): Promise<void> {
+        const profiles: Partial<
+            Record<
+                BookingStatus,
+                {
+                    title: string;
+                    body: string;
+                    type: NotificationType;
+                    tone: NotificationTone;
+                    icon: string;
+                }
+            >
+        > = {
+            [BookingStatus.EN_ROUTE]: {
+                title: `${booking.providerSnapshot.displayName} is on the way`,
+                body: 'You can track their progress from the booking screen.',
+                type: NotificationType.AGENT,
+                tone: NotificationTone.ACCENT,
+                icon: 'pin',
+            },
+            [BookingStatus.IN_PROGRESS]: {
+                title: 'Service in progress',
+                body: `${booking.providerSnapshot.displayName} has started the job.`,
+                type: NotificationType.REMINDER,
+                tone: NotificationTone.ACCENT,
+                icon: 'tools',
+            },
+            [BookingStatus.COMPLETED]: {
+                title: 'Rate your job',
+                body: `How was ${booking.providerSnapshot.displayName}? Your feedback updates their rating.`,
+                type: NotificationType.REP,
+                tone: NotificationTone.NEUTRAL,
+                icon: 'star',
+            },
+        };
+        const profile = profiles[booking.status];
+        if (!profile) return;
+        try {
+            await this.notifications.create({
+                userId: booking.customerId,
+                type: profile.type,
+                tone: profile.tone,
+                icon: profile.icon,
+                title: profile.title,
+                body: profile.body,
+                cta: { label: 'Open booking', target: `/bookings/${booking.uuid}` },
+                bookingId: booking.id,
+            });
+        } catch (err) {
+            this.logger.warn({
+                message: 'Failed to enqueue status notification',
+                data: {
+                    bookingCode: booking.bookingCode,
+                    status: booking.status,
+                    err: String(err),
+                },
+            });
+        }
+    }
+
+    private async notifyCancelled(booking: Booking, dto: CancelBookingDto): Promise<void> {
+        try {
+            await this.notifications.create({
+                userId: booking.customerId,
+                type: NotificationType.AGENT,
+                tone: NotificationTone.WARN,
+                icon: 'warn',
+                title: 'Booking cancelled',
+                body: `${booking.providerSnapshot.displayName} · ${dto.reason}${dto.note ? ` — ${dto.note}` : ''}`,
+                cta: { label: 'View booking', target: `/bookings/${booking.uuid}` },
+                bookingId: booking.id,
+                metadata: { cancelledBy: dto.cancelledBy },
+            });
+        } catch (err) {
+            this.logger.warn({
+                message: 'Failed to enqueue cancellation notification',
+                data: { bookingCode: booking.bookingCode, err: String(err) },
+            });
+        }
     }
 
     private resolveScheduledAt(override: string | undefined, intentStart: string | null): Date {

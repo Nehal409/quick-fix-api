@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AgentsModule } from '../agents';
 import { AuthenticationModule } from '../authentication';
+import { NotificationsModule } from '../notifications';
 import { ProvidersModule } from '../providers';
 import { RequestsModule } from '../requests';
 import { UsersModule } from '../users';
@@ -15,6 +16,7 @@ import { BookingsRepository } from './repositories';
         TypeOrmModule.forFeature([Booking]),
         AgentsModule,
         AuthenticationModule,
+        NotificationsModule,
         ProvidersModule,
         RequestsModule,
         UsersModule,
