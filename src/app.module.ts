@@ -6,7 +6,17 @@ import { WinstonModule } from 'nest-winston';
 import configuration from '../config';
 import { dataSourceOptions } from '../database/data-source';
 import { CustomResponseMiddleware, winstonLogger } from './common';
-import { AuthenticationModule, UsersModule } from './modules';
+import {
+    AgentsModule,
+    AuthenticationModule,
+    BookingsModule,
+    GeminiModule,
+    MatchingModule,
+    PricingModule,
+    ProvidersModule,
+    RequestsModule,
+    UsersModule,
+} from './modules';
 
 @Module({
     providers: [
@@ -29,7 +39,14 @@ import { AuthenticationModule, UsersModule } from './modules';
             instance: winstonLogger,
             transports: winstonLogger.transports,
         }),
+        AgentsModule,
         AuthenticationModule,
+        BookingsModule,
+        GeminiModule,
+        MatchingModule,
+        PricingModule,
+        ProvidersModule,
+        RequestsModule,
         UsersModule,
     ],
 })

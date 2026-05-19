@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { messages } from 'src/common/constants';
+import { Roles } from 'src/common/enums';
+import { ProvidersService } from '../providers';
 import { User } from '../users/entities';
 import { UsersRepository } from '../users/repositories';
 import { LoginDto, RegisterDto } from './dto';
@@ -12,6 +14,7 @@ import { AuthResponse, JwtPayload } from './interfaces';
 export class AuthService {
     constructor(
         private readonly usersRepository: UsersRepository,
+        private readonly providersService: ProvidersService,
         private readonly jwtService: JwtService,
     ) {}
 
@@ -24,6 +27,10 @@ export class AuthService {
         const passwordHash = await bcrypt.hash(dto.password, 12);
 
         const user = await this.usersRepository.create({ ...dto, passwordHash });
+
+        if (user.role === Roles.PROVIDER) {
+            await this.providersService.createForUser(user);
+        }
 
         return this.buildAuthResponse(user);
     }

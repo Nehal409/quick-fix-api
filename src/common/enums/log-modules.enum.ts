@@ -4,6 +4,7 @@ export enum LogModuleTypes {
     PROVIDERS = 'PROVIDERS',
     BOOKINGS = 'BOOKINGS',
     AGENTS = 'AGENTS',
+    GEMINI = 'GEMINI',
     NOTIFICATIONS = 'NOTIFICATIONS',
     SCHEDULING = 'SCHEDULING',
 }

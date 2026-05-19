@@ -9,6 +9,10 @@ interface Config {
     };
     gemini: {
         apiKey: string;
+        flashModel: string;
+        proModel: string;
+        timeoutMs: number;
+        maxRetries: number;
     };
 }
 
@@ -23,5 +27,9 @@ export default (): Config => ({
     },
     gemini: {
         apiKey: String(process.env.GEMINI_API_KEY),
+        flashModel: process.env.GEMINI_FLASH_MODEL || 'gemini-2.0-flash',
+        proModel: process.env.GEMINI_PRO_MODEL || 'gemini-2.5-pro',
+        timeoutMs: Number(process.env.GEMINI_TIMEOUT_MS) || 15000,
+        maxRetries: Number(process.env.GEMINI_MAX_RETRIES) || 2,
     },
 });

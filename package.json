@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"database/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"database/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -23,9 +23,11 @@
     "migrate:generate": "node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d database/data-source.ts",
     "migrate:run": "node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d database/data-source.ts",
     "migrate:revert": "node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d database/data-source.ts",
-    "schema:drop": "node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop -d database/data-source.ts"
+    "schema:drop": "node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop -d database/data-source.ts",
+    "seed": "node -r ts-node/register -r tsconfig-paths/register database/seed.ts"
   },
   "dependencies": {
+    "@google/genai": "^2.3.0",
     "@hapi/boom": "^10.0.1",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^11.1.0",
