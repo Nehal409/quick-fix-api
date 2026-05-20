@@ -42,6 +42,8 @@ export class IntentAgentService implements Agent<IntentAgentInput, IntentAgentRe
             validate: isParsedIntent,
         });
 
+        ensureWhenClarification(data, input);
+
         this.orchestrator.recordTrace(context, {
             agent: this.name,
             gemini: trace,
@@ -130,6 +132,38 @@ function capitalize(s: string): string {
 
 function urgencyWindow(urgency: 'low' | 'medium' | 'high'): string {
     return urgency === 'high' ? 'next 24 hrs' : urgency === 'medium' ? 'next 3 days' : 'flexible';
+}
+
+// Belt-and-suspenders: even when Gemini scores high confidence and skips the
+// clarification, never let the pipeline schedule a job without an explicit
+// time from the user. Skipped when an answer to "when-missing" has already
+// been provided in this turn, otherwise we'd loop on the same question.
+function ensureWhenClarification(intent: ParsedIntent, input: IntentAgentInput): void {
+    const hasTime = Boolean(intent.when.start || intent.when.window);
+    if (hasTime) return;
+
+    const alreadyAnswered = (input.clarificationAnswers ?? []).some((qa) =>
+        /when|time|schedule|kab|kal|abhi|subah|shaam/i.test(qa.question),
+    );
+    if (alreadyAnswered) return;
+
+    const alreadyAsked = intent.clarifications.some(
+        (c) => /when|time|schedule/i.test(c.id) || /when|time/i.test(c.fieldTarget),
+    );
+    if (alreadyAsked) return;
+
+    intent.clarifications.push({
+        id: 'when-missing',
+        prompt: 'When would you like the technician to visit?',
+        fieldTarget: 'when.window',
+        type: 'choice',
+        options: [
+            { value: 'now', label: 'As soon as possible', recommended: true },
+            { value: 'today_evening', label: 'Today evening' },
+            { value: 'tomorrow_morning', label: 'Tomorrow morning' },
+            { value: 'tomorrow_evening', label: 'Tomorrow evening' },
+        ],
+    });
 }
 
 function isParsedIntent(value: unknown): value is ParsedIntent {

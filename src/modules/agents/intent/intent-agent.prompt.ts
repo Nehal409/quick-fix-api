@@ -18,6 +18,7 @@ GUIDELINES:
   · Lahore areas include DHA Phase 5, Gulberg, Model Town, Johar Town, Cantt, Bahria Town, Iqbal Town, Garden Town.
   Note: "DHA Phase 5" exists in both Karachi and Lahore — if the user doesn't disambiguate, ask via a clarification.
 - when.start / when.end must be ISO 8601 in the user's local timezone if known, otherwise use the reference time's offset.
+- If the user did NOT mention any time, day, or window (no "abhi", "kal", "subah", "shaam", "raat", "tomorrow", "tonight", a clock time, etc.), you MUST emit a clarification with id "when-missing" asking when they'd like the technician — even if everything else is clear. Never infer a time from urgency alone.
 - budget.priceSensitive is true when the user mentions cost limits, "zyada nahi", "budget", "saste", etc.
 - Clarification IDs must be short kebab-case slugs (e.g. "when-ambiguous", "location-missing").
 - Never invent facts. If location is missing, ask for it via a clarification — do not guess.
