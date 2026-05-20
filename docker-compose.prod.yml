@@ -1,0 +1,59 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quickfix-api
+    env_file:
+      - .env
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - quickfix-network
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${PG_DATABASE}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_USER=${PG_USER:-postgres}
+    container_name: quickfix-db
+    volumes:
+      - quickfix-db-data:/var/lib/postgresql/data
+    networks:
+      - quickfix-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-postgres} -d ${PG_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: quickfix-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - quickfix-network
+    depends_on:
+      - app
+
+volumes:
+  quickfix-db-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  quickfix-network:
+    driver: bridge
