@@ -44,32 +44,60 @@ The end-to-end flow is:
 
 ## Architecture
 
-```text
-React Native App
-    |
-    | HTTPS REST API
-    v
-Caddy Reverse Proxy
-    |
-    v
-NestJS API
-    |
-    |-- Auth Module
-    |-- Users Module
-    |-- Requests Module
-    |-- Agents Module
-    |-- Providers Module
-    |-- Matching Module
-    |-- Pricing Module
-    |-- Bookings Module
-    |-- Notifications Module
-    |-- Gemini Module
-    |
-    v
-PostgreSQL 16
+```mermaid
+flowchart LR
+    APP["React Native App<br/>customer and provider UI"]
+    API["NestJS API<br/>auth, requests, agents, bookings"]
+    DB[("PostgreSQL 16<br/>application data")]
+    AI["Google Gemini<br/>intent and explanations"]
+
+    APP -->|"HTTPS REST"| API
+    API -->|"read/write"| DB
+    API -.->|"LLM calls"| AI
+
+    classDef app fill:#e8f3ff,stroke:#3b82f6,color:#0f172a
+    classDef api fill:#ecfdf3,stroke:#22c55e,color:#0f172a
+    classDef data fill:#f8f0ff,stroke:#a855f7,color:#0f172a
+    classDef ai fill:#fff7ed,stroke:#f97316,color:#0f172a
+
+    class APP app
+    class API api
+    class DB data
+    class AI ai
 ```
 
 The backend is modular rather than a single large controller. Request handling lives in `RequestsModule`, booking lifecycle in `BookingsModule`, and agent orchestration in `AgentsModule`. Deterministic services are used for matching and pricing so the core business logic is inspectable and reproducible, while Gemini is used where language understanding or user-facing explanations are valuable.
+
+### Deployment & Runtime Flow
+
+End-to-end path of a customer request, from mobile device to database, including the deployment topology on the GCP VM:
+
+```mermaid
+graph LR
+    subgraph Device["Customer / Provider device"]
+        RN[React Native App<br/>iOS / Android]
+    end
+
+    subgraph GCP["GCP VM &middot; me-central1-b &middot; e2-small (2 vCPU / 2 GB)"]
+        direction TB
+        Caddy[Caddy<br/>HTTPS reverse proxy<br/>quickfix-api.duckdns.org]
+        API[NestJS API<br/>Docker container<br/>port 3000]
+        DB[(PostgreSQL 16<br/>Docker container<br/>persistent volume)]
+        Caddy --> API
+        API --> DB
+    end
+
+    Gemini[(Google Gemini API<br/>Flash / Pro)]
+
+    RN -- HTTPS<br/>JSON REST --> Caddy
+    API -. JSON over HTTPS<br/>intent / pricing / ranking .-> Gemini
+```
+
+Notes:
+
+- The three production containers (`caddy`, `app`, `db`) are orchestrated by `docker-compose.prod.yml` on a single VM.
+- TLS termination happens at Caddy; the API and database listen only on the internal Docker network.
+- Gemini is the only external dependency on the hot path; all other state is local to the VM.
 
 ## Agent Design
 
@@ -83,6 +111,37 @@ The backend is modular rather than a single large controller. Request handling l
 | Orchestrator | Creates trace IDs and records per-agent traces | NestJS service |
 
 The hot path uses fast, bounded outputs. Intent and pricing use Gemini with response schemas and validation. Ranking is mostly deterministic so the selected provider can be explained and audited rather than being a black-box LLM choice.
+
+### Agentic Pipeline Flow
+
+The diagram below shows what is actually implemented in [src/modules/agents/](src/modules/agents/). Clarification and booking confirmation each cross an HTTP boundary — the orchestrator returns and the client makes a fresh request to resume.
+
+```mermaid
+graph TD
+    User(["User text<br/>POST /requests"]) --> ORCH["Orchestrator<br/>creates traceId"]
+    ORCH --> A1["Step 1: Intent Agent<br/>Gemini Flash + JSON schema"]
+
+    A1 -->|"confidence &lt; 0.7"| Clarify(["Return status:<br/>needs_clarification"])
+    Clarify -. "user answers in app" .-> Resume["POST /requests/:uuid/clarify"]
+    Resume --> A1
+
+    A1 -->|"confidence &gt;= 0.7"| A2["Step 2: Discovery Agent<br/>DB query by category + sector"]
+    A2 --> A3["Step 3: Ranking Agent<br/>8-factor score + Gemini narrative"]
+    A3 --> A4["Step 4: Pricing Agent<br/>Deterministic formula + Gemini explanation"]
+    A4 --> Ready(["Return status: ready<br/>ranked_candidates + pricing_quote"])
+
+    Ready -. "user confirms in app" .-> Confirm["POST /bookings"]
+    Confirm --> A5["Step 5: Booking Agent<br/>Deterministic booking code"]
+    A5 --> Done(["Booking saved + in-app +<br/>simulated WhatsApp notification"])
+
+    ORCH -. "agent traces" .-> DB[("PostgreSQL")]
+    A5 -. "snapshots + timeline" .-> DB
+
+    classDef ext fill:#eef,stroke:#88a
+    A1:::ext
+    A3:::ext
+    A4:::ext
+```
 
 ## Matching and Pricing Logic
 
