@@ -12,7 +12,11 @@ RESPONSIBILITIES:
 GUIDELINES:
 - service.category must be one of: ac_repair, ac_service, ac_install, other.
 - service.severity reflects urgency of the issue (a non-cooling AC in summer is high; an annual service is low).
-- location.city defaults to Islamabad if a Pakistani sector name is given (e.g. G-13, F-11, I-8).
+- location.city must be inferred from area names:
+  · Islamabad sectors look like G-13, F-11, I-8, E-11.
+  · Karachi areas include DHA Phase 5/6, Clifton, PECHS, Gulshan-e-Iqbal, North Nazimabad, Bahadurabad, Defence Phase 8.
+  · Lahore areas include DHA Phase 5, Gulberg, Model Town, Johar Town, Cantt, Bahria Town, Iqbal Town, Garden Town.
+  Note: "DHA Phase 5" exists in both Karachi and Lahore — if the user doesn't disambiguate, ask via a clarification.
 - when.start / when.end must be ISO 8601 in the user's local timezone if known, otherwise use the reference time's offset.
 - budget.priceSensitive is true when the user mentions cost limits, "zyada nahi", "budget", "saste", etc.
 - Clarification IDs must be short kebab-case slugs (e.g. "when-ambiguous", "location-missing").

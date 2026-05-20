@@ -22,24 +22,79 @@ export interface SeedProvider {
     role: Roles;
 }
 
-const SECTORS = [
-    'G-13',
-    'G-11',
-    'G-10',
-    'G-9',
-    'F-11',
-    'F-10',
-    'F-8',
-    'F-7',
-    'I-8',
-    'I-10',
-    'E-11',
-];
+interface CityConfig {
+    sectors: string[];
+    lat: number;
+    lng: number;
+}
 
-const PROVIDER_DATA = [
+const CITY_CONFIG: Record<string, CityConfig> = {
+    Islamabad: {
+        sectors: [
+            'G-13',
+            'G-11',
+            'G-10',
+            'G-9',
+            'F-11',
+            'F-10',
+            'F-8',
+            'F-7',
+            'I-8',
+            'I-10',
+            'E-11',
+        ],
+        lat: 33.6844,
+        lng: 73.0479,
+    },
+    Karachi: {
+        sectors: [
+            'DHA-Phase-5',
+            'DHA-Phase-6',
+            'Clifton',
+            'PECHS',
+            'Gulshan-e-Iqbal',
+            'North-Nazimabad',
+            'Bahadurabad',
+            'Defence-Phase-8',
+        ],
+        lat: 24.8607,
+        lng: 67.0011,
+    },
+    Lahore: {
+        sectors: [
+            'DHA-Phase-5',
+            'Gulberg-III',
+            'Model-Town',
+            'Johar-Town',
+            'Cantt',
+            'Bahria-Town',
+            'Iqbal-Town',
+            'Garden-Town',
+        ],
+        lat: 31.5204,
+        lng: 74.3587,
+    },
+};
+
+interface ProviderSeed {
+    name: string;
+    business: string;
+    city: keyof typeof CITY_CONFIG;
+    home: string;
+    spec: string[];
+    gen: number;
+    rating: number;
+    on: number;
+    cancel: number;
+    fee: number;
+}
+
+const PROVIDER_DATA: ProviderSeed[] = [
+    // ─── Islamabad ───────────────────────────────────────────────
     {
         name: 'Ali Khan',
         business: 'Ali Khan AC Services',
+        city: 'Islamabad',
         home: 'G-13',
         spec: ['inverter', 'split'],
         gen: 8,
@@ -51,6 +106,7 @@ const PROVIDER_DATA = [
     {
         name: 'Bilal Ahmed',
         business: 'Bilal AC Repair',
+        city: 'Islamabad',
         home: 'G-13',
         spec: ['generalist'],
         gen: 5,
@@ -62,6 +118,7 @@ const PROVIDER_DATA = [
     {
         name: 'Kaif Hussain',
         business: 'Kaif Cooling Co.',
+        city: 'Islamabad',
         home: 'G-11',
         spec: ['split', 'budget'],
         gen: 6,
@@ -73,6 +130,7 @@ const PROVIDER_DATA = [
     {
         name: 'Hamza Riaz',
         business: 'Hamza Tech',
+        city: 'Islamabad',
         home: 'F-11',
         spec: ['generalist'],
         gen: 4,
@@ -84,6 +142,7 @@ const PROVIDER_DATA = [
     {
         name: 'Usman Sheikh',
         business: 'CoolCare Islamabad',
+        city: 'Islamabad',
         home: 'F-10',
         spec: ['inverter', 'premium'],
         gen: 10,
@@ -95,6 +154,7 @@ const PROVIDER_DATA = [
     {
         name: 'Faisal Raza',
         business: 'Faisal AC Solutions',
+        city: 'Islamabad',
         home: 'I-8',
         spec: ['split', 'window'],
         gen: 7,
@@ -106,6 +166,7 @@ const PROVIDER_DATA = [
     {
         name: 'Tariq Mehmood',
         business: 'Tariq Cooling',
+        city: 'Islamabad',
         home: 'G-10',
         spec: ['generalist', 'budget'],
         gen: 3,
@@ -117,6 +178,7 @@ const PROVIDER_DATA = [
     {
         name: 'Imran Aslam',
         business: 'Imran AC Works',
+        city: 'Islamabad',
         home: 'F-8',
         spec: ['inverter'],
         gen: 9,
@@ -128,6 +190,7 @@ const PROVIDER_DATA = [
     {
         name: 'Saad Iqbal',
         business: 'Saad Refrigeration',
+        city: 'Islamabad',
         home: 'I-10',
         spec: ['commercial', 'central'],
         gen: 12,
@@ -139,6 +202,7 @@ const PROVIDER_DATA = [
     {
         name: 'Yasir Mahmood',
         business: 'Yasir AC Care',
+        city: 'Islamabad',
         home: 'F-7',
         spec: ['split', 'premium'],
         gen: 6,
@@ -150,6 +214,7 @@ const PROVIDER_DATA = [
     {
         name: 'Naveed Khan',
         business: 'Naveed Cooling',
+        city: 'Islamabad',
         home: 'G-9',
         spec: ['generalist'],
         gen: 5,
@@ -161,6 +226,7 @@ const PROVIDER_DATA = [
     {
         name: 'Asif Mehmood',
         business: 'Asif AC Specialists',
+        city: 'Islamabad',
         home: 'E-11',
         spec: ['inverter', 'split'],
         gen: 8,
@@ -172,6 +238,7 @@ const PROVIDER_DATA = [
     {
         name: 'Junaid Khalid',
         business: 'Junaid Tech Services',
+        city: 'Islamabad',
         home: 'G-13',
         spec: ['budget'],
         gen: 4,
@@ -183,6 +250,7 @@ const PROVIDER_DATA = [
     {
         name: 'Rashid Anwar',
         business: 'Rashid Cooling Experts',
+        city: 'Islamabad',
         home: 'F-11',
         spec: ['inverter', 'premium'],
         gen: 11,
@@ -194,6 +262,7 @@ const PROVIDER_DATA = [
     {
         name: 'Aamir Sohail',
         business: 'Aamir AC Service Center',
+        city: 'Islamabad',
         home: 'G-11',
         spec: ['generalist', 'window'],
         gen: 6,
@@ -205,6 +274,7 @@ const PROVIDER_DATA = [
     {
         name: 'Salman Khan',
         business: 'Salman Refrigeration',
+        city: 'Islamabad',
         home: 'F-10',
         spec: ['commercial'],
         gen: 9,
@@ -216,6 +286,7 @@ const PROVIDER_DATA = [
     {
         name: 'Zahid Bashir',
         business: 'Zahid Quick Fix',
+        city: 'Islamabad',
         home: 'I-8',
         spec: ['generalist', 'budget'],
         gen: 3,
@@ -227,6 +298,7 @@ const PROVIDER_DATA = [
     {
         name: 'Adeel Akhtar',
         business: 'Adeel AC Pros',
+        city: 'Islamabad',
         home: 'G-10',
         spec: ['split', 'inverter'],
         gen: 7,
@@ -238,6 +310,7 @@ const PROVIDER_DATA = [
     {
         name: 'Kashif Mehmood',
         business: 'Kashif Cool Care',
+        city: 'Islamabad',
         home: 'F-8',
         spec: ['split'],
         gen: 5,
@@ -249,6 +322,7 @@ const PROVIDER_DATA = [
     {
         name: 'Waqas Ali',
         business: 'Waqas AC Solutions',
+        city: 'Islamabad',
         home: 'I-10',
         spec: ['inverter', 'premium'],
         gen: 10,
@@ -260,6 +334,7 @@ const PROVIDER_DATA = [
     {
         name: 'Nadeem Hassan',
         business: 'Nadeem Cooling Services',
+        city: 'Islamabad',
         home: 'F-7',
         spec: ['generalist'],
         gen: 4,
@@ -271,6 +346,7 @@ const PROVIDER_DATA = [
     {
         name: 'Shahid Iqbal',
         business: 'Shahid AC Works',
+        city: 'Islamabad',
         home: 'G-9',
         spec: ['inverter', 'split'],
         gen: 8,
@@ -282,6 +358,7 @@ const PROVIDER_DATA = [
     {
         name: 'Asad Rana',
         business: 'Asad Refrigeration',
+        city: 'Islamabad',
         home: 'E-11',
         spec: ['commercial', 'central'],
         gen: 13,
@@ -293,6 +370,7 @@ const PROVIDER_DATA = [
     {
         name: 'Mohsin Raza',
         business: 'Mohsin Cool Tech',
+        city: 'Islamabad',
         home: 'G-13',
         spec: ['split', 'window'],
         gen: 5,
@@ -304,6 +382,7 @@ const PROVIDER_DATA = [
     {
         name: 'Ahsan Mahmood',
         business: 'Ahsan AC Specialists',
+        city: 'Islamabad',
         home: 'F-11',
         spec: ['inverter'],
         gen: 7,
@@ -315,6 +394,7 @@ const PROVIDER_DATA = [
     {
         name: 'Imtiaz Ahmad',
         business: 'Imtiaz Quick Cool',
+        city: 'Islamabad',
         home: 'G-11',
         spec: ['budget', 'generalist'],
         gen: 3,
@@ -326,6 +406,7 @@ const PROVIDER_DATA = [
     {
         name: 'Khurram Shahzad',
         business: 'Khurram AC Experts',
+        city: 'Islamabad',
         home: 'F-10',
         spec: ['inverter', 'premium'],
         gen: 11,
@@ -337,6 +418,7 @@ const PROVIDER_DATA = [
     {
         name: 'Zubair Hassan',
         business: 'Zubair Cool Care',
+        city: 'Islamabad',
         home: 'I-8',
         spec: ['generalist'],
         gen: 4,
@@ -348,6 +430,7 @@ const PROVIDER_DATA = [
     {
         name: 'Atif Aslam',
         business: 'Atif AC Repair',
+        city: 'Islamabad',
         home: 'G-10',
         spec: ['split', 'inverter'],
         gen: 6,
@@ -359,6 +442,7 @@ const PROVIDER_DATA = [
     {
         name: 'Bilal Ahmad Khan',
         business: 'Bilal Refrigeration Hub',
+        city: 'Islamabad',
         home: 'F-8',
         spec: ['commercial'],
         gen: 10,
@@ -367,12 +451,377 @@ const PROVIDER_DATA = [
         cancel: 0.018,
         fee: 2100,
     },
-] as const;
 
-function adjacentSectors(home: string): string[] {
-    const idx = SECTORS.indexOf(home);
+    // ─── Karachi ─────────────────────────────────────────────────
+    {
+        name: 'Arsalan Memon',
+        business: 'Arsalan AC Care Karachi',
+        city: 'Karachi',
+        home: 'DHA-Phase-5',
+        spec: ['inverter', 'premium'],
+        gen: 9,
+        rating: 4.8,
+        on: 0.95,
+        cancel: 0.014,
+        fee: 2000,
+    },
+    {
+        name: 'Farhan Siddiqui',
+        business: 'Farhan Cool Tech',
+        city: 'Karachi',
+        home: 'DHA-Phase-6',
+        spec: ['split', 'inverter'],
+        gen: 7,
+        rating: 4.6,
+        on: 0.92,
+        cancel: 0.024,
+        fee: 1750,
+    },
+    {
+        name: 'Hassan Baloch',
+        business: 'Hassan Cooling Services',
+        city: 'Karachi',
+        home: 'Clifton',
+        spec: ['inverter', 'premium'],
+        gen: 11,
+        rating: 4.9,
+        on: 0.97,
+        cancel: 0.01,
+        fee: 2100,
+    },
+    {
+        name: 'Sohail Ansari',
+        business: 'Sohail AC Repair',
+        city: 'Karachi',
+        home: 'PECHS',
+        spec: ['generalist', 'window'],
+        gen: 5,
+        rating: 4.4,
+        on: 0.88,
+        cancel: 0.042,
+        fee: 1450,
+    },
+    {
+        name: 'Daniyal Qureshi',
+        business: 'Daniyal Quick Fix',
+        city: 'Karachi',
+        home: 'PECHS',
+        spec: ['budget', 'generalist'],
+        gen: 3,
+        rating: 4.0,
+        on: 0.8,
+        cancel: 0.085,
+        fee: 1100,
+    },
+    {
+        name: 'Tahir Shah',
+        business: 'Tahir Cool Solutions',
+        city: 'Karachi',
+        home: 'Gulshan-e-Iqbal',
+        spec: ['split', 'budget'],
+        gen: 4,
+        rating: 4.2,
+        on: 0.83,
+        cancel: 0.06,
+        fee: 1300,
+    },
+    {
+        name: 'Owais Rauf',
+        business: 'Owais AC Specialists',
+        city: 'Karachi',
+        home: 'Gulshan-e-Iqbal',
+        spec: ['inverter'],
+        gen: 8,
+        rating: 4.7,
+        on: 0.93,
+        cancel: 0.02,
+        fee: 1700,
+    },
+    {
+        name: 'Rizwan Memon',
+        business: 'Rizwan Refrigeration',
+        city: 'Karachi',
+        home: 'North-Nazimabad',
+        spec: ['commercial', 'central'],
+        gen: 12,
+        rating: 4.8,
+        on: 0.95,
+        cancel: 0.012,
+        fee: 2300,
+    },
+    {
+        name: 'Shoaib Lakhani',
+        business: 'Shoaib Cooling Hub',
+        city: 'Karachi',
+        home: 'North-Nazimabad',
+        spec: ['generalist'],
+        gen: 5,
+        rating: 4.3,
+        on: 0.86,
+        cancel: 0.05,
+        fee: 1350,
+    },
+    {
+        name: 'Kamran Akmal',
+        business: 'Kamran AC Works',
+        city: 'Karachi',
+        home: 'Bahadurabad',
+        spec: ['split', 'inverter'],
+        gen: 6,
+        rating: 4.5,
+        on: 0.9,
+        cancel: 0.028,
+        fee: 1550,
+    },
+    {
+        name: 'Wasim Akhtar',
+        business: 'Wasim Cool Care',
+        city: 'Karachi',
+        home: 'Bahadurabad',
+        spec: ['generalist', 'budget'],
+        gen: 4,
+        rating: 4.1,
+        on: 0.82,
+        cancel: 0.07,
+        fee: 1200,
+    },
+    {
+        name: 'Bilawal Sheikh',
+        business: 'Bilawal AC Pros',
+        city: 'Karachi',
+        home: 'Defence-Phase-8',
+        spec: ['inverter', 'premium'],
+        gen: 10,
+        rating: 4.9,
+        on: 0.96,
+        cancel: 0.011,
+        fee: 2150,
+    },
+    {
+        name: 'Hammad Vohra',
+        business: 'Hammad Refrigeration Hub',
+        city: 'Karachi',
+        home: 'Defence-Phase-8',
+        spec: ['commercial'],
+        gen: 9,
+        rating: 4.6,
+        on: 0.91,
+        cancel: 0.025,
+        fee: 2050,
+    },
+    {
+        name: 'Junaid Soomro',
+        business: 'Junaid Cooling Co.',
+        city: 'Karachi',
+        home: 'Clifton',
+        spec: ['split', 'premium'],
+        gen: 7,
+        rating: 4.7,
+        on: 0.94,
+        cancel: 0.018,
+        fee: 1850,
+    },
+    {
+        name: 'Asim Lodhi',
+        business: 'Asim AC Service Center',
+        city: 'Karachi',
+        home: 'DHA-Phase-5',
+        spec: ['generalist', 'window'],
+        gen: 5,
+        rating: 4.4,
+        on: 0.87,
+        cancel: 0.045,
+        fee: 1500,
+    },
+
+    // ─── Lahore ──────────────────────────────────────────────────
+    {
+        name: 'Hamza Sheikh',
+        business: 'Hamza Cool Care Lahore',
+        city: 'Lahore',
+        home: 'DHA-Phase-5',
+        spec: ['inverter', 'premium'],
+        gen: 10,
+        rating: 4.9,
+        on: 0.97,
+        cancel: 0.01,
+        fee: 1950,
+    },
+    {
+        name: 'Zeeshan Butt',
+        business: 'Zeeshan AC Solutions',
+        city: 'Lahore',
+        home: 'DHA-Phase-5',
+        spec: ['split', 'inverter'],
+        gen: 8,
+        rating: 4.7,
+        on: 0.94,
+        cancel: 0.018,
+        fee: 1750,
+    },
+    {
+        name: 'Talha Chaudhry',
+        business: 'Talha Cooling Experts',
+        city: 'Lahore',
+        home: 'Gulberg-III',
+        spec: ['inverter', 'premium'],
+        gen: 11,
+        rating: 4.8,
+        on: 0.96,
+        cancel: 0.012,
+        fee: 2000,
+    },
+    {
+        name: 'Saif Ullah',
+        business: 'Saif AC Repair',
+        city: 'Lahore',
+        home: 'Gulberg-III',
+        spec: ['split', 'window'],
+        gen: 6,
+        rating: 4.5,
+        on: 0.9,
+        cancel: 0.03,
+        fee: 1500,
+    },
+    {
+        name: 'Bilal Tariq',
+        business: 'Bilal Refrigeration Lahore',
+        city: 'Lahore',
+        home: 'Model-Town',
+        spec: ['commercial', 'central'],
+        gen: 13,
+        rating: 4.9,
+        on: 0.98,
+        cancel: 0.009,
+        fee: 2250,
+    },
+    {
+        name: 'Hassan Mughal',
+        business: 'Hassan Cool Tech',
+        city: 'Lahore',
+        home: 'Model-Town',
+        spec: ['generalist'],
+        gen: 4,
+        rating: 4.2,
+        on: 0.84,
+        cancel: 0.055,
+        fee: 1300,
+    },
+    {
+        name: 'Umar Farooq',
+        business: 'Umar AC Specialists',
+        city: 'Lahore',
+        home: 'Johar-Town',
+        spec: ['inverter'],
+        gen: 7,
+        rating: 4.6,
+        on: 0.92,
+        cancel: 0.022,
+        fee: 1650,
+    },
+    {
+        name: 'Adnan Cheema',
+        business: 'Adnan Quick Fix',
+        city: 'Lahore',
+        home: 'Johar-Town',
+        spec: ['budget', 'generalist'],
+        gen: 3,
+        rating: 4.0,
+        on: 0.79,
+        cancel: 0.085,
+        fee: 1050,
+    },
+    {
+        name: 'Fawad Akhtar',
+        business: 'Fawad Cooling Hub',
+        city: 'Lahore',
+        home: 'Cantt',
+        spec: ['inverter', 'split'],
+        gen: 9,
+        rating: 4.7,
+        on: 0.94,
+        cancel: 0.02,
+        fee: 1700,
+    },
+    {
+        name: 'Raheel Sharif',
+        business: 'Raheel AC Care',
+        city: 'Lahore',
+        home: 'Cantt',
+        spec: ['generalist', 'budget'],
+        gen: 4,
+        rating: 4.3,
+        on: 0.86,
+        cancel: 0.048,
+        fee: 1350,
+    },
+    {
+        name: 'Mubashir Ali',
+        business: 'Mubashir Cool Solutions',
+        city: 'Lahore',
+        home: 'Bahria-Town',
+        spec: ['inverter', 'premium'],
+        gen: 8,
+        rating: 4.7,
+        on: 0.93,
+        cancel: 0.02,
+        fee: 1850,
+    },
+    {
+        name: 'Sufyan Anwar',
+        business: 'Sufyan AC Pros',
+        city: 'Lahore',
+        home: 'Bahria-Town',
+        spec: ['split'],
+        gen: 5,
+        rating: 4.4,
+        on: 0.88,
+        cancel: 0.04,
+        fee: 1450,
+    },
+    {
+        name: 'Noman Javed',
+        business: 'Noman Refrigeration Hub',
+        city: 'Lahore',
+        home: 'Iqbal-Town',
+        spec: ['commercial'],
+        gen: 10,
+        rating: 4.6,
+        on: 0.91,
+        cancel: 0.025,
+        fee: 2050,
+    },
+    {
+        name: 'Haris Rauf',
+        business: 'Haris AC Works',
+        city: 'Lahore',
+        home: 'Iqbal-Town',
+        spec: ['generalist', 'window'],
+        gen: 6,
+        rating: 4.5,
+        on: 0.89,
+        cancel: 0.035,
+        fee: 1400,
+    },
+    {
+        name: 'Sohaib Maqsood',
+        business: 'Sohaib Service Center',
+        city: 'Lahore',
+        home: 'Garden-Town',
+        spec: ['split', 'inverter'],
+        gen: 7,
+        rating: 4.6,
+        on: 0.92,
+        cancel: 0.024,
+        fee: 1550,
+    },
+];
+
+function adjacentSectors(home: string, city: keyof typeof CITY_CONFIG): string[] {
+    const sectors = CITY_CONFIG[city].sectors;
+    const idx = sectors.indexOf(home);
     if (idx < 0) return [home];
-    const neighbours = [SECTORS[idx - 1], SECTORS[idx + 1]].filter((s): s is string => Boolean(s));
+    const neighbours = [sectors[idx - 1], sectors[idx + 1]].filter((s): s is string => Boolean(s));
     return [home, ...neighbours];
 }
 
@@ -380,26 +829,29 @@ function emailFor(name: string): string {
     return `${name.toLowerCase().replace(/[^a-z]+/g, '.')}@quickfix.demo`;
 }
 
-export const SEED_PROVIDERS: SeedProvider[] = PROVIDER_DATA.map((p) => ({
-    role: Roles.PROVIDER,
-    user: { email: emailFor(p.name), name: p.name },
-    provider: {
-        displayName: p.business,
-        serviceCategories: ['ac_repair', 'ac_service'],
-        specializationTags: [...p.spec],
-        serviceAreas: adjacentSectors(p.home),
-        homeSector: p.home,
-        homeCity: 'Islamabad',
-        homeLat: 33.6844,
-        homeLng: 73.0479,
-        experienceYears: p.gen,
-        rating: p.rating,
-        reviewCount: 40 + Math.floor(p.rating * 20),
-        onTimePercent: p.on,
-        cancelRate: p.cancel,
-        completedJobs30d: 8 + Math.floor(p.on * 22),
-        baseVisitFee: p.fee,
-    },
-}));
+export const SEED_PROVIDERS: SeedProvider[] = PROVIDER_DATA.map((p) => {
+    const cityCfg = CITY_CONFIG[p.city];
+    return {
+        role: Roles.PROVIDER,
+        user: { email: emailFor(p.name), name: p.name },
+        provider: {
+            displayName: p.business,
+            serviceCategories: ['ac_repair', 'ac_service'],
+            specializationTags: [...p.spec],
+            serviceAreas: adjacentSectors(p.home, p.city),
+            homeSector: p.home,
+            homeCity: p.city,
+            homeLat: cityCfg.lat,
+            homeLng: cityCfg.lng,
+            experienceYears: p.gen,
+            rating: p.rating,
+            reviewCount: 40 + Math.floor(p.rating * 20),
+            onTimePercent: p.on,
+            cancelRate: p.cancel,
+            completedJobs30d: 8 + Math.floor(p.on * 22),
+            baseVisitFee: p.fee,
+        },
+    };
+});
 
 export const SEED_PROVIDER_PASSWORD = 'provider123';
