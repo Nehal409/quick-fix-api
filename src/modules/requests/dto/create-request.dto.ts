@@ -1,26 +1,4 @@
-import { Type } from 'class-transformer';
-import {
-    IsEnum,
-    IsNotEmpty,
-    IsObject,
-    IsOptional,
-    IsString,
-    MaxLength,
-    MinLength,
-    ValidateNested,
-} from 'class-validator';
-
-class LocationHintDto {
-    @IsOptional()
-    @IsString()
-    @MaxLength(64)
-    sector?: string;
-
-    @IsOptional()
-    @IsString()
-    @MaxLength(64)
-    city?: string;
-}
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export enum RequestLanguage {
     EN = 'en',
@@ -39,10 +17,4 @@ export class CreateRequestDto {
     @IsOptional()
     @IsEnum(RequestLanguage, { message: 'Language must be en, ur, roman_ur, or auto.' })
     language?: RequestLanguage;
-
-    @IsOptional()
-    @IsObject()
-    @ValidateNested()
-    @Type(() => LocationHintDto)
-    location?: LocationHintDto;
 }

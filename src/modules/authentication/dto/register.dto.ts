@@ -15,4 +15,12 @@ export class RegisterDto {
 
     @IsEnum(Roles, { message: 'Role must be customer or provider.' })
     role: Roles;
+
+    @IsString()
+    @IsNotEmpty({ message: 'City is required.' })
+    city: string;
+
+    @IsString()
+    @IsNotEmpty({ message: 'Sector/area is required.' })
+    sector: string;
 }

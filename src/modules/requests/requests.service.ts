@@ -20,6 +20,7 @@ import {
 import { NotificationsService, NotificationTone, NotificationType } from '../notifications';
 import { MarketSignal } from '../pricing';
 import { Provider, ProvidersRepository } from '../providers';
+import { UsersRepository } from '../users';
 import { ClarifyRequestDto, CreateRequestDto } from './dto';
 import { PersistedRankedCandidate, ServiceRequest } from './entities';
 import { RequestStatus } from './enums';
@@ -40,6 +41,7 @@ export class RequestsService {
     constructor(
         private readonly repository: RequestsRepository,
         private readonly providersRepository: ProvidersRepository,
+        private readonly usersRepository: UsersRepository,
         private readonly intentAgent: IntentAgentService,
         private readonly discoveryAgent: DiscoveryAgentService,
         private readonly rankingAgent: RankingAgentService,
@@ -49,19 +51,29 @@ export class RequestsService {
     ) {}
 
     async create(userId: number, dto: CreateRequestDto): Promise<RequestResponse> {
+        const user = await this.usersRepository.findById(userId);
+        if (!user) {
+            throw badRequest(messages.USER.NOT_FOUND);
+        }
+
+        const location = {
+            city: user.city || undefined,
+            sector: user.sector || undefined,
+        };
+
         const context = this.orchestrator.createContext();
         const request = await this.repository.create({
             userId,
             rawInput: dto.rawInput,
             language: dto.language ?? null,
-            locationHint: dto.location ?? null,
+            locationHint: location,
             status: RequestStatus.PENDING,
             traceId: context.traceId,
         });
 
         return this.runPipeline(request, context, async () =>
             this.intentAgent.run(
-                { rawInput: dto.rawInput, language: dto.language, location: dto.location },
+                { rawInput: dto.rawInput, language: dto.language, location },
                 context,
             ),
         );

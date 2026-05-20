@@ -31,6 +31,12 @@ export class User {
     @Column({ type: 'enum', enum: Roles })
     role: Roles;
 
+    @Column({ nullable: true })
+    city: string;
+
+    @Column({ nullable: true })
+    sector: string;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 

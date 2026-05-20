@@ -35,6 +35,8 @@ export class UsersRepository {
                 passwordHash: data.passwordHash,
                 name: data.name,
                 role: data.role,
+                city: data.city,
+                sector: data.sector,
             }),
         );
     }
@@ -47,6 +49,8 @@ export class UsersRepository {
                 email: true,
                 name: true,
                 role: true,
+                city: true,
+                sector: true,
                 createdAt: true,
             },
         });

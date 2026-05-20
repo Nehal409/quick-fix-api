@@ -4,6 +4,7 @@ import { AgentsModule } from '../agents';
 import { AuthenticationModule } from '../authentication';
 import { NotificationsModule } from '../notifications';
 import { ProvidersModule } from '../providers';
+import { UsersModule } from '../users';
 import { ServiceRequest } from './entities';
 import { RequestsRepository } from './repositories';
 import { RequestsController } from './requests.controller';
@@ -16,6 +17,7 @@ import { RequestsService } from './requests.service';
         AuthenticationModule,
         NotificationsModule,
         ProvidersModule,
+        UsersModule,
     ],
     controllers: [RequestsController],
     providers: [RequestsService, RequestsRepository],
