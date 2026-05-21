@@ -1,0 +1,50 @@
+{
+  "auth": {
+    "tagline": "Pakistan mein AI-powered AC repair",
+    "loginTitle": "Dobara Khushamdeed",
+    "registerTitle": "Account Banayein",
+    "email": "Email address",
+    "password": "Password",
+    "fullName": "Pura naam",
+    "phone": "Phone number (ikhtiyari)",
+    "city": "Shehar",
+    "sector": "Sector / Ilaqa",
+    "login": "Login Karein",
+    "register": "Account Banayein",
+    "noAccount": "Account nahi? Register karein",
+    "hasAccount": "Account hai? Login karein",
+    "error": "Ghalti",
+    "fillAll": "Tamam zaroori khane bharein.",
+    "loginFailed": "Email ya password ghalat hai.",
+    "registerFailed": "Registration fail hui. Dobara koshish karein.",
+    "role": {
+      "customer": "Customer",
+      "provider": "Technician"
+    }
+  },
+  "chat": {
+    "placeholder": "AC ka masla batayein...",
+    "greeting": "Assalam o Alaikum! Main Quickfix hoon. AC mein kya masla hai?",
+    "how_i_decided": "Maine Kaise Decide Kiya",
+    "confirming": "Aapki baat samajh raha hoon...",
+    "searching": "Qareeb technicians dhundh raha hoon...",
+    "matching": "Behtareen options rank kar raha hoon...",
+    "pricing": "Qeemat calculate kar raha hoon...",
+    "booking": "Booking ban rahi hai..."
+  },
+  "booking": {
+    "confirmed": "Booking Confirm Ho Gayi",
+    "pending": "Zair Ghour",
+    "en_route": "Technician Aa Raha Hai",
+    "in_progress": "Kaam Chal Raha Hai",
+    "completed": "Mukammal",
+    "cancelled": "Mnsoukh",
+    "auto_rescheduled": "Dobara Schedule Ho Gaya",
+    "disputed": "Ikhtelaaf"
+  },
+  "language": {
+    "en": "EN",
+    "ur": "اردو",
+    "roman-ur": "Roman"
+  }
+}

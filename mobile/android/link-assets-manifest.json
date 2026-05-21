@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Inter-VariableFont_opsz,wght.ttf",
+      "sha1": "ee5c2e22ffeddefc433c9aa4c76779bb73a5c682"
+    },
+    {
+      "path": "src/assets/fonts/NotoNastaliqUrdu-VariableFont_wght.ttf",
+      "sha1": "6aa9c99c2446e1fdd306bebbb468fe66d9c0b56e"
+    },
+    {
+      "path": "src/assets/fonts/README.md",
+      "sha1": "080f26c1cbea241de4f940a44fcf7ac092959d18"
+    }
+  ]
+}

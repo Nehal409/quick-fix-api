@@ -1,0 +1,50 @@
+{
+  "auth": {
+    "tagline": "Tell us what you need in Urdu, Roman Urdu, or English. We match, schedule, and watch over the job — end to end.",
+    "loginTitle": "Welcome Back",
+    "registerTitle": "Create Account",
+    "email": "Email address",
+    "password": "Password",
+    "fullName": "Full name",
+    "phone": "Phone number (optional)",
+    "city": "City",
+    "sector": "Sector / Area",
+    "login": "Log In",
+    "register": "Create Account",
+    "noAccount": "Don't have an account? Register",
+    "hasAccount": "Already have an account? Log In",
+    "error": "Error",
+    "fillAll": "Please fill in all required fields.",
+    "loginFailed": "Invalid email or password.",
+    "registerFailed": "Registration failed. Please try again.",
+    "role": {
+      "customer": "Customer",
+      "provider": "Technician"
+    }
+  },
+  "chat": {
+    "placeholder": "Describe your AC problem...",
+    "greeting": "Hi! I'm Quickfix. Tell me what's wrong with your AC.",
+    "how_i_decided": "How I Decided",
+    "confirming": "Let me confirm what I heard...",
+    "searching": "Searching for nearby technicians...",
+    "matching": "Ranking the best matches...",
+    "pricing": "Calculating your price...",
+    "booking": "Creating your booking..."
+  },
+  "booking": {
+    "confirmed": "Booking Confirmed",
+    "pending": "Pending",
+    "en_route": "Provider En Route",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "auto_rescheduled": "Auto-Rescheduled",
+    "disputed": "Disputed"
+  },
+  "language": {
+    "en": "EN",
+    "ur": "اردو",
+    "roman-ur": "Roman"
+  }
+}
