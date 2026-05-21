@@ -7,7 +7,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Alert,
 } from 'react-native';
@@ -18,7 +17,7 @@ import Config from 'react-native-config';
 import { authApi } from '../../lib/api';
 import { mockLogin } from '../../lib/mockAuth';
 import { useAuthStore } from '../../store/authStore';
-import { Colors, Spacing, Radius, Fonts } from '../../theme';
+import { Colors, Spacing, Radius } from '../../theme';
 import { LanguageSwitcher } from '../../components/ui/LanguageSwitcher';
 import type { RootStackParams } from '../../navigation/types';
 import type { User } from '../../types';
@@ -27,22 +26,31 @@ type Nav = NativeStackNavigationProp<RootStackParams, 'Login'>;
 
 const DEMO = Config.DEMO_MODE === 'true';
 
-function decodeJwt(token: string): { bauserId?: number; role?: 'customer' | 'provider' } | null {
+const B64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+function b64decode(str: string): string {
+  let out = '';
+  let i = 0;
+  str = str.replace(/[^A-Za-z0-9+/]/g, '');
+  while (i < str.length) {
+    const e1 = B64_CHARS.indexOf(str[i++]);
+    const e2 = B64_CHARS.indexOf(str[i++]);
+    const e3 = B64_CHARS.indexOf(str[i] !== undefined ? str[i++] : 'A');
+    const e4 = B64_CHARS.indexOf(str[i] !== undefined ? str[i++] : 'A');
+    out += String.fromCharCode((e1 << 2) | (e2 >> 4));
+    if (e3 !== -1) out += String.fromCharCode(((e2 & 15) << 4) | (e3 >> 2));
+    if (e4 !== -1) out += String.fromCharCode(((e3 & 3) << 6) | e4);
+  }
+  return out;
+}
+
+function decodeJwt(token: string): { id?: string; userId?: string; role?: 'customer' | 'provider'; email?: string; name?: string } | null {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
-    
     const base64Url = parts[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const padLen = (4 - (base64.length % 4)) % 4;
-    const padded = base64 + '='.repeat(padLen);
-    
-    const decoded = decodeURIComponent(
-      padded.split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
-    );
-    return JSON.parse(decoded);
-  } catch (error) {
-    console.error('Failed to decode JWT token:', error);
+    return JSON.parse(b64decode(base64));
+  } catch {
     return null;
   }
 }
@@ -72,20 +80,20 @@ export function LoginScreen() {
       const { data } = await authApi.login(email, password);
       console.log('Login Response Data:', data);
       
-      const token = (data as any)?.data?.token || data?.token;
+      const token = (data as any)?.data?.token ?? data?.token;
       if (!token) {
         throw new Error('Server did not return a valid authentication token.');
       }
-      
-      // Decode JWT token to extract user details since the backend response doesn't provide a nested user object
+
+      const apiUser = (data as any)?.data?.user ?? (data as any)?.user;
       const decoded = decodeJwt(token);
       const user: User = {
-        id: decoded?.bauserId?.toString() || 'user-' + Date.now(),
-        email: email,
-        name: email.split('@')[0] || 'User',
-        role: decoded?.role || role,
+        id: apiUser?.id ?? decoded?.id ?? decoded?.userId ?? 'user-' + Date.now(),
+        email: apiUser?.email ?? decoded?.email ?? email,
+        name: apiUser?.name ?? decoded?.name ?? email.split('@')[0] ?? 'User',
+        role: apiUser?.role ?? decoded?.role ?? role,
       };
-      
+
       await setAuth(token, user);
     } catch (err: any) {
       console.error('Login error:', err);
@@ -100,11 +108,12 @@ export function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
     >
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         {/* Header */}
         <View style={styles.header}>

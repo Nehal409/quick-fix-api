@@ -9,12 +9,27 @@ interface BookingConfirmCardProps {
   onCalendar?: () => void;
 }
 
+function fmtDate(iso: string | undefined): string {
+  if (!iso) return '—';
+  try {
+    return new Date(iso).toLocaleString('en-PK', { dateStyle: 'medium', timeStyle: 'short' });
+  } catch {
+    return iso;
+  }
+}
+
 export function BookingConfirmCard({ booking, onTrack, onCalendar }: BookingConfirmCardProps) {
+  const providerName = booking.provider?.name ?? 'Provider';
+  const scheduledLabel = fmtDate(booking.scheduledAt);
+  const priceLabel = booking.totalPrice != null
+    ? `Rs. ${booking.totalPrice.toLocaleString()} · cash after service`
+    : 'To be confirmed';
+
   const details = [
-    { label: 'WHEN', value: booking.scheduledAt, icon: '📅' },
-    { label: 'WHERE', value: booking.address ?? 'Street 24, G-13/3, Islamabad', icon: '📍', note: '2.7km from provider' },
-    { label: 'SERVICE', value: booking.service ?? 'AC repair · Inverter unit', icon: '🔧' },
-    { label: 'TOTAL', value: `Rs. ${booking.totalPrice.toLocaleString()} · cash after service`, icon: '💰' },
+    { label: 'WHEN', value: scheduledLabel, icon: '📅' },
+    { label: 'WHERE', value: booking.address ?? 'Address to be confirmed', icon: '📍', note: undefined },
+    { label: 'SERVICE', value: booking.service ?? 'Service', icon: '🔧' },
+    { label: 'TOTAL', value: priceLabel, icon: '💰' },
     { label: 'BOOKING ID', value: booking.id, icon: '🆔' },
   ];
 
@@ -27,17 +42,17 @@ export function BookingConfirmCard({ booking, onTrack, onCalendar }: BookingConf
         <Text style={styles.bookedLabel}>BOOKING CONFIRMED</Text>
         <Text style={styles.successTitle}>
           You're booked for{'\n'}
-          <Text style={styles.timeHighlight}>{booking.scheduledAt.split(' - ')[0]}</Text>
+          <Text style={styles.timeHighlight}>{scheduledLabel}</Text>
         </Text>
       </View>
 
       <View style={styles.providerInfo}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{booking.provider.name[0]}</Text>
+          <Text style={styles.avatarText}>{providerName[0] ?? '?'}</Text>
         </View>
         <View style={styles.providerText}>
-          <Text style={styles.providerName}>{booking.provider.name}</Text>
-          <Text style={styles.providerMeta}>★ {booking.provider.rating}  ·  {booking.provider.reviews} reviews</Text>
+          <Text style={styles.providerName}>{providerName}</Text>
+          <Text style={styles.providerMeta}>★ {booking.provider?.rating ?? '—'}  ·  {booking.provider?.reviews ?? 0} reviews</Text>
         </View>
         <TouchableOpacity style={styles.msgBtn}>
           <Text style={styles.msgIcon}>💬</Text>
@@ -62,7 +77,10 @@ export function BookingConfirmCard({ booking, onTrack, onCalendar }: BookingConf
           <Text style={styles.whatsappBadgeText}>✦ SIMULATED WHATSAPP</Text>
         </View>
         <Text style={styles.whatsappText}>
-          <Text style={styles.bold}>Quickfix:</Text> Booking confirmed with {booking.provider.name} for {booking.scheduledAt.split(' - ')[0]}. Reminder will be sent 1 hour before. Reply CANCEL to cancel.
+          {booking.whatsappPayload?.message
+            ? booking.whatsappPayload.message
+            : <><Text style={styles.bold}>Quickfix:</Text>{` Booking confirmed with ${providerName} for ${scheduledLabel}. Reminder will be sent 1 hour before. Reply CANCEL to cancel.`}</>
+          }
         </Text>
       </View>
 

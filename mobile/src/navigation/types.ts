@@ -20,3 +20,10 @@ export type UserTabParams = {
   Notifications: undefined;
   Profile: undefined;
 };
+
+export type ProviderTabParams = {
+  Home: undefined;
+  Jobs: undefined;
+  Inbox: undefined;
+  Profile: undefined;
+};

@@ -94,6 +94,11 @@ export const requestsApi = {
     api.get(`/requests/${requestId}/candidates/${providerUuid}/reasoning`),
 };
 
+// ── Users ─────────────────────────────────────────────
+export const usersApi = {
+  me: () => api.get<{ id: string; email: string; name: string; role: 'customer' | 'provider' }>('/users/me'),
+};
+
 // ── Bookings ──────────────────────────────────────────
 export const bookingsApi = {
   create: (payload: CreateBookingPayload) =>

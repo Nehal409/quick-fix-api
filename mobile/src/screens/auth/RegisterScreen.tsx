@@ -7,7 +7,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Alert,
 } from 'react-native';
@@ -58,9 +57,9 @@ export function RegisterScreen() {
       await setAuth(token, user as User);
     } catch (err: any) {
       console.error('REGISTER_ERROR', JSON.stringify(err?.response?.data ?? err?.message ?? err));
-      console.log("registrationerror", err);
-      
-      Alert.alert(t('auth.error'), t('auth.registerFailed'));
+      const serverMessage = err?.response?.data?.message || err?.response?.data?.error;
+      const errorMessage = serverMessage || err?.message || t('auth.registerFailed');
+      Alert.alert(t('auth.error'), errorMessage);
     } finally {
       setLoading(false);
     }
@@ -69,9 +68,13 @@ export function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
     >
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Text style={styles.logo}>Quickfix</Text>
           <LanguageSwitcher />
